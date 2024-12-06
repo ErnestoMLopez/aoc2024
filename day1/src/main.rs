@@ -2,7 +2,6 @@ use std::fs;
 use std::io::{self, BufRead};
 
 fn main() {
-
     println!("Advent of Code 2024 - Day 1");
 
     let input_file = "input.txt";
@@ -16,7 +15,9 @@ fn main() {
         let line = line.expect("Error reading line");
 
         let numbers: (i32, i32) = {
-            let mut iter = line.split_whitespace().map(|s| s.parse().expect("Error parsing number"));
+            let mut iter = line
+                .split_whitespace()
+                .map(|s| s.parse().expect("Error parsing number"));
             (iter.next().unwrap(), iter.next().unwrap())
         };
 
@@ -28,18 +29,20 @@ fn main() {
     column2.sort();
 
     let mut distance = 0;
-    
+
     for i in 0..column1.len() {
         if column1[i] < column2[i] {
             distance += column2[i] - column1[i];
         } else {
             distance += column1[i] - column2[i];
-        }            
+        }
     }
-    
-    let similarity : i32 = column1.iter().map(|&x| x * column2.iter().filter(|&&y| y == x).count() as i32).sum();
-    
+
+    let similarity: i32 = column1
+        .iter()
+        .map(|&x| x * column2.iter().filter(|&&y| y == x).count() as i32)
+        .sum();
+
     println!("Distance: {}", distance);
     println!("Similarity: {}", similarity);
-
 }
