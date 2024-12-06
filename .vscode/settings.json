@@ -1,0 +1,15 @@
+{
+    "editor.bracketPairColorization.independentColorPoolPerBracketType": false,
+    "editor.colorDecorators": true,
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "editor.inlayHints.fontFamily": "Cascadia Code Light",
+    "editor.inlayHints.fontSize": 16,
+    "workbench.colorCustomizations": {
+        "editorInlayHint.background": "#222222",
+        "editorInlayHint.foreground": "#9999999f",
+        "editorInlayHint.parameterBackground": "#222222",
+        "editorInlayHint.parameterForeground": "#9999999f",
+        "editorInlayHint.typeBackground": "#222222",
+        "editorInlayHint.typeForeground": "#9999999f"
+    },
+}
