@@ -3,7 +3,7 @@ use std::io::{self, BufRead};
 
 fn main() {
 
-    println!("Advent of Code 2024 - Day 2");
+    println!("Advent of Code 2024 - Day 1");
 
     let input_file = "input.txt";
     let file = fs::File::open(input_file).expect("Error opening file");
