@@ -57,16 +57,13 @@ fn main() {
 
         match safety {
             Some(unsafe_level) => {
-                println!("Unsafe report: {:?} at level {}", report, unsafe_level);
-
+                // Pruebo eliminando uno de los dos posibles niveles que causaron el problema
                 let new_report1 = remove_level(&report, unsafe_level as isize);
-                let new_report2 = remove_level(&report, (unsafe_level as isize) - 1);
-                let new_report3 = remove_level(&report, (unsafe_level as isize) + 1);
+                let new_report2 = remove_level(&report, (unsafe_level as isize) + 1);
                 let new_safety1 = check_report(&new_report1);
                 let new_safety2 = check_report(&new_report2);
-                let new_safety3 = check_report(&new_report3);
 
-                if new_safety1.is_none() || new_safety2.is_none() || new_safety3.is_none() {
+                if new_safety1.is_none() || new_safety2.is_none() {
                     near_safe_reports += 1;
                 }
             }
