@@ -4,17 +4,35 @@ use std::io::{self, BufRead};
 fn check_report(numbers: &Vec<i32>) -> Option<usize> {
     let diffnumbers: Vec<i32> = numbers.windows(2).map(|x| x[1] - x[0]).collect();
 
+    let unbounded = diffnumbers.iter().map(|x| x.abs()).position(|x| x > 3);
+
+    if let Some(index) = unbounded {
+        return Some(index);
+    }
+
     let positive_steps = diffnumbers.iter().filter(|&&x| x > 0).count();
     let negative_steps = diffnumbers.iter().filter(|&&x| x < 0).count();
-
     let monotonic = positive_steps == diffnumbers.len() || negative_steps == diffnumbers.len();
-    let bounded = diffnumbers.iter().map(|x| x.abs()).max().unwrap() <= 3;
 
-    if monotonic && bounded {
+    if monotonic {
         None
     } else {
-        Some(0 as usize) // El índice del nivel conflictivo no se implementa aún
+        if positive_steps < negative_steps {
+            return Some(diffnumbers.iter().position(|&x| x >= 0).unwrap());
+        } else {
+            return Some(diffnumbers.iter().position(|&x| x <= 0).unwrap());
+        }
     }
+}
+
+fn remove_level(report: &Vec<i32>, level: isize) -> Vec<i32> {
+    if level < 0 || level >= report.len() as isize {
+        return report.clone();
+    }
+
+    let mut new_report = report.clone();
+    new_report.remove(level as usize);
+    new_report
 }
 
 fn main() {
@@ -25,24 +43,40 @@ fn main() {
     let reader = io::BufReader::new(file);
 
     let mut safe_reports = 0;
+    let mut near_safe_reports = 0;
 
     for line in reader.lines() {
         let line = line.expect("Error reading line");
 
-        let numbers: Vec<i32> = line
+        let report: Vec<i32> = line
             .split_whitespace()
             .map(|s| s.parse().expect("Error parsing number"))
             .collect();
 
-        let safety = check_report(&numbers);
+        let safety = check_report(&report);
 
         match safety {
-            Some(_unsafe_level) => {
-                println!("Unsafe report: {:?}", numbers);
+            Some(unsafe_level) => {
+                println!("Unsafe report: {:?} at level {}", report, unsafe_level);
+
+                let new_report1 = remove_level(&report, unsafe_level as isize);
+                let new_report2 = remove_level(&report, (unsafe_level as isize) - 1);
+                let new_report3 = remove_level(&report, (unsafe_level as isize) + 1);
+                let new_safety1 = check_report(&new_report1);
+                let new_safety2 = check_report(&new_report2);
+                let new_safety3 = check_report(&new_report3);
+
+                if new_safety1.is_none() || new_safety2.is_none() || new_safety3.is_none() {
+                    near_safe_reports += 1;
+                }
             }
             None => safe_reports += 1,
         }
     }
 
     println!("Safe reports: {}", safe_reports);
+    println!(
+        "Potentially safe reports: {}",
+        safe_reports + near_safe_reports
+    );
 }
