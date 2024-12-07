@@ -25,13 +25,14 @@ fn check_report(numbers: &Vec<i32>) -> Option<usize> {
     }
 }
 
-fn remove_level(report: &Vec<i32>, level: isize) -> Vec<i32> {
-    if level < 0 || level >= report.len() as isize {
-        return report.clone();
+fn remove_level(report: &Vec<i32>, level: usize) -> Vec<i32> {
+    let mut new_report = report.clone();
+
+    if level >= report.len() {
+        return new_report;
     }
 
-    let mut new_report = report.clone();
-    new_report.remove(level as usize);
+    new_report.remove(level);
     new_report
 }
 
@@ -58,8 +59,8 @@ fn main() {
         match safety {
             Some(unsafe_level) => {
                 // Pruebo eliminando uno de los dos posibles niveles que causaron el problema
-                let new_report1 = remove_level(&report, unsafe_level as isize);
-                let new_report2 = remove_level(&report, (unsafe_level as isize) + 1);
+                let new_report1 = remove_level(&report, unsafe_level);
+                let new_report2 = remove_level(&report, unsafe_level + 1);
                 let new_safety1 = check_report(&new_report1);
                 let new_safety2 = check_report(&new_report2);
 
