@@ -25,9 +25,9 @@ fn search_next_mul(buffer: &mut String) -> Option<(bool, i32, i32, usize)> {
                             return Some((true, num1, num2, start + j));
                         }
                     }
-                    Some((false, 0, 0, start + 4))
+                    Some((false, 0, 0, start))
                 }
-                None => Some((false, 0, 0, start + 4)),
+                None => Some((false, 0, 0, start)),
             }
         }
         None => None,
