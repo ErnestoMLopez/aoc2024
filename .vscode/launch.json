@@ -8,9 +8,9 @@
             "type": "lldb",
             "request": "launch",
             "name": "Rust Debug",
-            "program": "${workspaceFolder}/day2/target/debug/day2.exe",
+            "program": "${workspaceFolder}/day3/target/debug/day3.exe",
             "args": [],
-            "cwd": "${workspaceFolder}/day2/"
+            "cwd": "${workspaceFolder}/day3/"
         }
     ]
 }
