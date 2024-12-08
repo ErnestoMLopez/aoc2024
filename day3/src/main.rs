@@ -13,7 +13,7 @@ fn search_next_mul(buffer: &mut String) -> Option<(bool, i32, i32, usize)> {
                 limit = start + 7;
             }
 
-            let end = buffer[start..limit + 1].find(")");
+            let end = buffer[start..=limit].find(")");
             match end {
                 Some(j) => {
                     let args = &buffer[start..start + j];
