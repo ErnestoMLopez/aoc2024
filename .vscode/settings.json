@@ -12,4 +12,5 @@
         "editorInlayHint.typeBackground": "#222222",
         "editorInlayHint.typeForeground": "#9999999f"
     },
+    "lldb.script": { "lang.rust.toolchain": "x86_64-pc-windows-gnu" }
 }
