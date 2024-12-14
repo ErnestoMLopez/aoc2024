@@ -6,7 +6,7 @@ use std::io;
 use std::io::Read;
 
 fn main() {
-    println!("Advent of Code 2024 - Day 3");
+    println!("Advent of Code 2024 - Day 4");
 
     let input_file = "input.txt";
     let file = fs::File::open(input_file).expect("Error opening file");
@@ -45,13 +45,13 @@ fn main() {
             .for_each(|_| xmas_count += 1);
     });
 
-    matrix.iter_dw_diagonal().for_each(|dw_diagonal| {
-        dw_diagonal
+    matrix.iter_dw_diag().for_each(|dw_diag| {
+        dw_diag
             .iter()
             .collect::<String>()
             .matches("XMAS")
             .for_each(|_| xmas_count += 1);
-        dw_diagonal
+        dw_diag
             .iter()
             .rev()
             .collect::<String>()
@@ -59,13 +59,13 @@ fn main() {
             .for_each(|_| xmas_count += 1);
     });
 
-    matrix.iter_uw_diagonal().for_each(|uw_diagonal| {
-        uw_diagonal
+    matrix.iter_uw_diag().for_each(|uw_diag| {
+        uw_diag
             .iter()
             .collect::<String>()
             .matches("XMAS")
             .for_each(|_| xmas_count += 1);
-        uw_diagonal
+        uw_diag
             .iter()
             .rev()
             .collect::<String>()

@@ -63,7 +63,7 @@ impl<'a, T: 'a + Clone> Matrix<T> {
         }
     }
 
-    pub fn iter_uw_diagonal(&'a self) -> MatrixUwDiagIterator<'a, T> {
+    pub fn iter_uw_diag(&'a self) -> MatrixUwDiagIterator<'a, T> {
         MatrixUwDiagIterator {
             origin: self,
             current_row: 0,
@@ -71,7 +71,7 @@ impl<'a, T: 'a + Clone> Matrix<T> {
         }
     }
 
-    pub fn iter_dw_diagonal(&'a self) -> MatrixDwDiagIterator<'a, T> {
+    pub fn iter_dw_diag(&'a self) -> MatrixDwDiagIterator<'a, T> {
         MatrixDwDiagIterator {
             origin: self,
             current_row: 0,
