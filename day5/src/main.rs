@@ -25,10 +25,16 @@ fn main() {
     let mut result = 0;
 
     for line in raw_updates.lines() {
-        result += check_update(line, &rules);
+        let update: Vec<usize> = line.split(',').map(|x| x.parse().unwrap()).collect();
+
+        let (valid, middle) = check_update(&update, &rules);
+
+        if valid {
+            result += middle;
+        }
     }
 
-    println!("Result: {}", result);
+    println!("Result Part 1: {}", result);
 }
 
 fn create_rulebook(raw_rules: &str) -> HashMap<usize, Vec<usize>> {
@@ -46,8 +52,7 @@ fn create_rulebook(raw_rules: &str) -> HashMap<usize, Vec<usize>> {
     rules
 }
 
-fn check_update(raw_update: &str, rules: &HashMap<usize, Vec<usize>>) -> usize {
-    let pages: Vec<usize> = raw_update.split(',').map(|x| x.parse().unwrap()).collect();
+fn check_update(pages: &Vec<usize>, rules: &HashMap<usize, Vec<usize>>) -> (bool, usize) {
     let empty_rules: Vec<usize> = vec![];
 
     if pages.iter().enumerate().skip(1).all(|(n, page)| {
@@ -57,8 +62,10 @@ fn check_update(raw_update: &str, rules: &HashMap<usize, Vec<usize>>) -> usize {
             .take(n)
             .all(|&prev_page| !page_rules.contains(&prev_page))
     }) {
-        return pages.iter().nth((pages.len() - 1) / 2).unwrap().clone();
+        let middle = pages.iter().nth((pages.len() - 1) / 2).unwrap().clone();
+
+        return (true, middle);
     }
 
-    0
+    (false, 0)
 }
