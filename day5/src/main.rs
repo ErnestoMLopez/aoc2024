@@ -22,7 +22,8 @@ fn main() {
 
     let rules = create_rulebook(raw_rules);
 
-    let mut result = 0;
+    let mut part1 = 0;
+    let mut part2 = 0;
 
     for line in raw_updates.lines() {
         let update: Vec<usize> = line.split(',').map(|x| x.parse().unwrap()).collect();
@@ -30,11 +31,14 @@ fn main() {
         let (valid, middle) = check_update(&update, &rules);
 
         if valid {
-            result += middle;
+            part1 += middle;
+        } else {
+            part2 += fix_update(&update, &rules);
         }
     }
 
-    println!("Result Part 1: {}", result);
+    println!("Result Part 1: {}", part1);
+    println!("Result Part 2: {}", part2);
 }
 
 fn create_rulebook(raw_rules: &str) -> HashMap<usize, Vec<usize>> {
@@ -68,4 +72,29 @@ fn check_update(pages: &Vec<usize>, rules: &HashMap<usize, Vec<usize>>) -> (bool
     }
 
     (false, 0)
+}
+
+fn fix_update(pages: &Vec<usize>, rules: &HashMap<usize, Vec<usize>>) -> usize {
+    let mut reordered_pages: Vec<usize> = Vec::new();
+    let empty_rules: Vec<usize> = Vec::new();
+
+    pages.iter().for_each(|page| {
+        let page_rules = rules.get(page).unwrap_or(&empty_rules);
+
+        match reordered_pages
+            .iter()
+            .position(|prev_page| page_rules.contains(prev_page))
+        {
+            Some(index) => reordered_pages.insert(index, *page),
+            None => reordered_pages.push(*page),
+        }
+    });
+
+    let middle = reordered_pages
+        .iter()
+        .nth((pages.len() - 1) / 2)
+        .unwrap()
+        .clone();
+
+    middle
 }
