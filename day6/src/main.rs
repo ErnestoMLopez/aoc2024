@@ -48,6 +48,10 @@ struct Obstacles {
 fn main() {
     println!("Advent of Code 2024 - Day 4");
 
+    // Inicio el timer para calcular el tiempo de ejecución
+    use std::time::Instant;
+    let now = Instant::now();
+
     let input_file = "sample.txt";
     let file = fs::File::open(input_file).expect("Error opening file");
     let mut reader = io::BufReader::new(file);
@@ -67,6 +71,10 @@ fn main() {
             guard.position.x, guard.position.y
         );
     }
+
+    // Imprimo el tiempo de ejecución
+    let elapsed = now.elapsed();
+    println!("Elapsed time: {:.2?}", elapsed);
 }
 
 fn generate_map(grid: &Matrix<char>) -> (Guard, Obstacles) {
