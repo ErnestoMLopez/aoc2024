@@ -2,17 +2,18 @@ pub mod mat;
 
 use mat::Matrix;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::fs;
 use std::io;
 use std::io::Read;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
 struct Position {
     x: usize,
     y: usize,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Direction {
     Up,
     Down,
@@ -20,7 +21,7 @@ enum Direction {
     Right,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 struct Guard {
     position: Position,
     direction: Direction,
@@ -52,7 +53,7 @@ fn main() {
     use std::time::Instant;
     let now = Instant::now();
 
-    let input_file = "sample.txt";
+    let input_file = "input.txt";
     let file = fs::File::open(input_file).expect("Error opening file");
     let mut reader = io::BufReader::new(file);
 
@@ -65,16 +66,25 @@ fn main() {
 
     let (mut guard, obstacles) = generate_map(&matrix);
 
-    while move_guard(&mut guard, &obstacles) {
-        println!(
-            "Guard (X = {:?}, Y = {:?})",
-            guard.position.x, guard.position.y
-        );
+    let mut visited: HashSet<Position> = HashSet::new();
+
+    loop {
+        let prev_guard = guard.clone();
+
+        let patrol_ended = move_guard(&mut guard, &obstacles);
+
+        update_visited(&prev_guard, &guard, &mut visited);
+
+        if patrol_ended {
+            break;
+        }
     }
 
     // Imprimo el tiempo de ejecución
     let elapsed = now.elapsed();
     println!("Elapsed time: {:.2?}", elapsed);
+
+    println!("Positions visited: {}", visited.len());
 }
 
 fn generate_map(grid: &Matrix<char>) -> (Guard, Obstacles) {
@@ -141,11 +151,11 @@ fn move_guard(guard: &mut Guard, obstacles: &Obstacles) -> bool {
                 Some(obs_row) => {
                     guard.position.x = *obs_row + 1;
                     guard.rotate();
-                    return true;
+                    return false;
                 }
                 None => {
                     guard.position.x = 0;
-                    return false;
+                    return true;
                 }
             }
         }
@@ -160,11 +170,11 @@ fn move_guard(guard: &mut Guard, obstacles: &Obstacles) -> bool {
                 Some(obs_row) => {
                     guard.position.x = *obs_row - 1;
                     guard.rotate();
-                    return true;
+                    return false;
                 }
                 None => {
                     guard.position.x = obstacles.rows - 1;
-                    return false;
+                    return true;
                 }
             }
         }
@@ -180,11 +190,11 @@ fn move_guard(guard: &mut Guard, obstacles: &Obstacles) -> bool {
                 Some(obs_col) => {
                     guard.position.y = *obs_col + 1;
                     guard.rotate();
-                    return true;
+                    return false;
                 }
                 None => {
                     guard.position.y = 0;
-                    return false;
+                    return true;
                 }
             }
         }
@@ -199,12 +209,49 @@ fn move_guard(guard: &mut Guard, obstacles: &Obstacles) -> bool {
                 Some(obs_col) => {
                     guard.position.y = *obs_col - 1;
                     guard.rotate();
-                    return true;
+                    return false;
                 }
                 None => {
                     guard.position.y = obstacles.cols - 1;
-                    return false;
+                    return true;
                 }
+            }
+        }
+    }
+}
+
+fn update_visited(init: &Guard, end: &Guard, visited: &mut HashSet<Position>) {
+    match init.direction {
+        Direction::Up => {
+            for row in end.position.x..=init.position.x {
+                visited.insert(Position {
+                    x: row,
+                    y: init.position.y,
+                });
+            }
+        }
+        Direction::Down => {
+            for row in init.position.x..=end.position.x {
+                visited.insert(Position {
+                    x: row,
+                    y: init.position.y,
+                });
+            }
+        }
+        Direction::Left => {
+            for col in end.position.y..=init.position.y {
+                visited.insert(Position {
+                    x: init.position.x,
+                    y: col,
+                });
+            }
+        }
+        Direction::Right => {
+            for col in init.position.y..=end.position.y {
+                visited.insert(Position {
+                    x: init.position.x,
+                    y: col,
+                });
             }
         }
     }
