@@ -6,6 +6,7 @@ use std::collections::HashSet;
 use std::fs;
 use std::io;
 use std::io::Read;
+use std::time::Instant;
 
 #[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
 struct Position {
@@ -13,7 +14,7 @@ struct Position {
     y: usize,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 enum Direction {
     Up,
     Down,
@@ -21,7 +22,7 @@ enum Direction {
     Right,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, Hash, PartialEq)]
 struct Guard {
     position: Position,
     direction: Direction,
@@ -38,7 +39,7 @@ impl Guard {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Obstacles {
     per_row: HashMap<usize, Vec<usize>>,
     per_col: HashMap<usize, Vec<usize>>,
@@ -50,7 +51,6 @@ fn main() {
     println!("Advent of Code 2024 - Day 4");
 
     // Inicio el timer para calcular el tiempo de ejecución
-    use std::time::Instant;
     let now = Instant::now();
 
     let input_file = "input.txt";
@@ -63,10 +63,11 @@ fn main() {
         .expect("Error reading file");
 
     let matrix = Matrix::from_string(&buffer);
-
-    let (mut guard, obstacles) = generate_map(&matrix);
-
     let mut visited: HashSet<Position> = HashSet::new();
+
+    let (init_guard, obstacles) = generate_map(&matrix);
+
+    let mut guard = init_guard;
 
     loop {
         let prev_guard = guard.clone();
@@ -85,6 +86,38 @@ fn main() {
     println!("Elapsed time: {:.2?}", elapsed);
 
     println!("Positions visited: {}", visited.len());
+
+    // Parte 2
+    let now = Instant::now();
+
+    let mut loops_found = 0;
+
+    visited.iter().skip(1).for_each(|pos| {
+        let mut guard = init_guard;
+        let mut turning_point: HashSet<Guard> = HashSet::new();
+
+        let new_obstacles = add_obstacle(&obstacles, pos);
+
+        loop {
+            let patrol_ended = move_guard(&mut guard, &new_obstacles);
+
+            let patrol_loop = update_turning_point(&guard, &mut turning_point);
+
+            if patrol_loop {
+                loops_found += 1;
+                break;
+            }
+
+            if patrol_ended {
+                break;
+            }
+        }
+    });
+
+    let elapsed = now.elapsed();
+    println!("Elapsed time: {:.2?}", elapsed);
+
+    println!("Loops found: {}", loops_found);
 }
 
 fn generate_map(grid: &Matrix<char>) -> (Guard, Obstacles) {
@@ -255,4 +288,26 @@ fn update_visited(init: &Guard, end: &Guard, visited: &mut HashSet<Position>) {
             }
         }
     }
+}
+
+fn add_obstacle(obstacles: &Obstacles, pos: &Position) -> Obstacles {
+    let mut new_obstacles = obstacles.clone();
+
+    new_obstacles.per_row.get_mut(&pos.x).unwrap().push(pos.y);
+    new_obstacles.per_col.get_mut(&pos.y).unwrap().push(pos.x);
+
+    new_obstacles.per_row.get_mut(&pos.x).unwrap().sort();
+    new_obstacles.per_col.get_mut(&pos.y).unwrap().sort();
+
+    new_obstacles
+}
+
+fn update_turning_point(guard: &Guard, turning_point: &mut HashSet<Guard>) -> bool {
+    if turning_point.contains(guard) {
+        return true;
+    }
+
+    turning_point.insert(*guard);
+
+    false
 }
