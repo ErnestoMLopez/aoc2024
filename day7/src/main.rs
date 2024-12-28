@@ -12,7 +12,7 @@ struct Equation {
 }
 
 fn main() {
-    println!("Advent of Code 2024 - Day 4");
+    println!("Advent of Code 2024 - Day 7");
 
     // Inicio el timer para calcular el tiempo de ejecución
     let now = Instant::now();
