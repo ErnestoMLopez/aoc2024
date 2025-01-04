@@ -3,6 +3,28 @@ use std::io;
 use std::io::Read;
 use std::time::Instant;
 
+#[derive(Debug, Clone)]
+enum Block {
+    Free,
+    File(i32),
+}
+
+impl Block {
+    fn is_free(&self) -> bool {
+        match self {
+            Block::Free => true,
+            _ => false,
+        }
+    }
+
+    fn is_file(&self) -> bool {
+        match self {
+            Block::File(_) => true,
+            _ => false,
+        }
+    }
+}
+
 fn main() {
     println!("Advent of Code 2024 - Day 9");
 
@@ -35,17 +57,17 @@ fn parse_input(file: &str) -> String {
     buffer
 }
 
-fn get_disk_usage(buffer: &str) -> Vec<i32> {
-    let blocks: Vec<i32> = buffer
+fn get_disk_usage(buffer: &str) -> Vec<Block> {
+    let blocks: Vec<Block> = buffer
         .trim()
         .chars()
         .map(|x| x.to_digit(10).unwrap())
         .enumerate()
         .map(|(i, x)| {
             if i % 2 == 0 {
-                vec![(i / 2) as i32; x as usize]
+                vec![Block::File((i / 2) as i32); x as usize]
             } else {
-                vec![-1 as i32; x as usize]
+                vec![Block::Free; x as usize]
             }
         })
         .flatten()
@@ -54,11 +76,11 @@ fn get_disk_usage(buffer: &str) -> Vec<i32> {
     blocks
 }
 
-fn defragment_disk(disk: &mut Vec<i32>) {
+fn defragment_disk(disk: &mut Vec<Block>) {
     loop {
         // Busco el primer bloque sin datos y el último bloque con datos
-        let i_free = disk.iter().position(|&x| x == -1).unwrap();
-        let i_file = disk.len() - disk.iter().rev().position(|&x| x != -1).unwrap() - 1;
+        let i_free = disk.iter().position(|x| x.is_free()).unwrap();
+        let i_file = disk.len() - disk.iter().rev().position(|x| x.is_file()).unwrap() - 1;
 
         if i_free >= i_file {
             break;
@@ -68,10 +90,12 @@ fn defragment_disk(disk: &mut Vec<i32>) {
     }
 }
 
-fn calculate_checksum(disk: &Vec<i32>) -> u64 {
+fn calculate_checksum(disk: &Vec<Block>) -> u64 {
     disk.iter()
         .enumerate()
-        .filter(|(_, &x)| x >= 0)
-        .map(|(i, &x)| (i as u64) * (x as u64))
+        .map(|(i, block)| match block {
+            Block::Free => 0,
+            Block::File(id) => (i as u64) * (*id as u64),
+        })
         .sum()
 }
