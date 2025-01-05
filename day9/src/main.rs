@@ -77,10 +77,27 @@ fn get_disk_usage(buffer: &str) -> Vec<Block> {
 }
 
 fn defragment_disk(disk: &mut Vec<Block>) {
+    let length = disk.len();
+    let mut i_free: usize = 0;
+    let mut i_file: usize = length;
+
     loop {
         // Busco el primer bloque sin datos y el último bloque con datos
-        let i_free = disk.iter().position(|x| x.is_free()).unwrap();
-        let i_file = disk.len() - disk.iter().rev().position(|x| x.is_file()).unwrap() - 1;
+        i_free = i_free
+            + 1
+            + disk
+                .iter()
+                .skip(i_free + 1)
+                .position(|x| x.is_free())
+                .unwrap();
+        i_file = i_file
+            - 1
+            - disk
+                .iter()
+                .rev()
+                .skip(length - i_file)
+                .position(|x| x.is_file())
+                .unwrap();
 
         if i_free >= i_file {
             break;
