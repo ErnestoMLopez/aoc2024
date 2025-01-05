@@ -83,21 +83,17 @@ fn defragment_disk(disk: &mut Vec<Block>) {
 
     loop {
         // Busco el primer bloque sin datos y el último bloque con datos
-        i_free = i_free
-            + 1
-            + disk
-                .iter()
-                .skip(i_free + 1)
-                .position(|x| x.is_free())
-                .unwrap();
-        i_file = i_file
-            - 1
-            - disk
-                .iter()
-                .rev()
-                .skip(length - i_file)
-                .position(|x| x.is_file())
-                .unwrap();
+        i_free += 1 + disk
+            .iter()
+            .skip(i_free + 1)
+            .position(|x| x.is_free())
+            .unwrap();
+        i_file -= 1 + disk
+            .iter()
+            .rev()
+            .skip(length - i_file)
+            .position(|x| x.is_file())
+            .unwrap();
 
         if i_free >= i_file {
             break;
